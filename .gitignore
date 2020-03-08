@@ -1,0 +1,6 @@
+/data
+file_index.txt
+venv
+.idea
+.ipynb_checkpoints
+.vscode
