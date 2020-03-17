@@ -1,6 +1,8 @@
 /data
-file_index.txt
+notebook_data/file_index.txt
 venv
 .idea
 .ipynb_checkpoints
 .vscode
+cs276_inverted_index.p
+cs276_preprocessed_documents.p
