@@ -13,6 +13,13 @@ class Collection:
     """
 
     def __init__(self, name, stopwords_list, lemmatizer):
+        """
+
+        :param name: Chosen name for the collection
+        :param stopwords_list: list of words that won't be taken into account.
+        :param lemmatizer: Method to lemmatize / stem the document.
+
+        """
         self.__name = name
         self.documents: List[Document] = []
         self.inverted_index: Dict[str, List[Tuple[int, int]]] = {}
@@ -33,6 +40,10 @@ class Collection:
         return self.__name
 
     def __load_documents(self):
+        """Load each document in a vector of processed
+        tokens and serialize the vectors in a .p file, if this file doesn't already exist.
+        Assign the vectors to self.documents.
+        """
         try:
             filename = "{}_preprocessed_documents.p".format(self.name)
             self.documents = pickle.load(open(filename, "rb"))
@@ -57,10 +68,14 @@ class Collection:
         self.average_document_length /= self.nb_docs
 
     def __store_processed_documents(self):
+        """Serialize the tokenized self.documents using pickle"""
         preprocessed_documents = open("{}_preprocessed_documents.p".format(self.name), "wb")
         pickle.dump(self.documents, preprocessed_documents)
 
     def __load_inverted_index(self):
+        """
+        Create an inverted index with term weights per document, if it doesn't exist already
+        """
         try:
             filename = "{}_inverted_index.p".format(self.name)
             self.inverted_index = pickle.load(open(filename, "rb"))
@@ -79,9 +94,16 @@ class Collection:
         pickle.dump(self.inverted_index, inverted_index_file)
 
     def get_vocabulary(self):
+        """
+            Scan the inverted index and return a list of all the terms in the index.
+        """
         return list(self.inverted_index.keys())
 
     def __get_term_weight(self, target_term, target_doc_id):
+        """
+        :return: Return 0 if the term is not in the inverted index or the document doesn't comprise
+        this term, otherwise returns the weight of target_term in target_doc_id.
+        """
         try:
             term_weights = self.inverted_index[target_term]
         except KeyError as e:
@@ -92,6 +114,10 @@ class Collection:
         return 0
 
     def __get_pivoted_term_weight(self, target_term, target_doc_id, b):
+        """
+             Calculate the term weigth normalized by the length of the document,
+             using the tw-idf method.
+        """
         term_weight = self.__get_term_weight(target_term, target_doc_id)
         if term_weight == 0:
             return 0

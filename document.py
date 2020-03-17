@@ -1,7 +1,7 @@
 from os import path, getcwd
 from collections import Counter
 from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
+from nltk.stem import WordNetLemmatizer, PorterStemmer
 
 
 class Document:
@@ -26,6 +26,13 @@ class Document:
         return self.__id
 
     def load_data(self, path_to_documents):
+        """
+
+        :param path_to_documents: path to the collection downloaded from http://web.stanford.edu/class/cs276/pa/pa1-data.zip
+
+        Open and read the document
+        Set the private attribute tokens as a list of words presents in the document
+        """
         path_to_file = path.join(
             path_to_documents,
             "{}/{}".format(self.__folder, self.__url))
@@ -36,6 +43,10 @@ class Document:
         self.__store_key_words()
 
     def __remove_not_alpha(self):
+        """
+            Remove the tokens with non alpha characters of the tokens attribute.
+            Updates the length attribute.
+        """
         filtered_tokens = []
         for token in self.tokens:
             if token.isalpha():
@@ -44,10 +55,16 @@ class Document:
         self.__length = len(self.tokens)
 
     def __store_key_words(self):
+        """
+        Stores a list of the 5 most common words of the document
+        """
         counter = Counter(self.tokens)
         self.__key_words = [x[0] for x in counter.most_common(5)]
 
     def __remove_stopwords(self, stopwords_list):
+        """
+        Remove the useless words that are gathered in the stopwords collection of nltk
+        """
         self.tokens = [token for token in self.tokens if token not in stopwords_list]
         self.__length = len(self.tokens)
 
@@ -55,6 +72,11 @@ class Document:
         self.tokens = [lemmatizer.lemmatize(token) for token in self.tokens]
 
     def __create_graph_of_words(self, window):
+        """
+
+        :param window : int, size of the sliding window used to create the graph
+        :return: an undirected graph of words for the document
+        """
         n = len(self.tokens)
         graph_of_words = {}
         for i in range(n):
@@ -85,7 +107,7 @@ if __name__ == '__main__':
     word_net_lemmatizer = WordNetLemmatizer()
     nltk_stopwords = stopwords.words('english')
     document.process_document(nltk_stopwords, word_net_lemmatizer)
-
+    document.get_term_weights()
 
 
 
