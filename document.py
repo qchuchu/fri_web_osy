@@ -2,6 +2,7 @@ from os import path, getcwd
 from collections import Counter
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
+from helpers import create_graph_of_words
 
 
 class Document:
@@ -25,13 +26,21 @@ class Document:
     def id(self):
         return self.__id
 
+    @property
+    def folder(self):
+        return self.__folder
+
+    @property
+    def url(self):
+        return self.__url
+
     def load_data(self, path_to_documents):
         path_to_file = path.join(
-            path_to_documents,
-            "{}/{}".format(self.__folder, self.__url))
-        with open(path_to_file, 'r') as file:
+            path_to_documents, "{}/{}".format(self.__folder, self.__url)
+        )
+        with open(path_to_file, "r") as file:
             for line in file.readlines():
-                self.tokens.extend(line.rstrip('\n').split(' '))
+                self.tokens.extend(line.rstrip("\n").split(" "))
         self.__remove_not_alpha()
         self.__store_key_words()
 
@@ -54,21 +63,8 @@ class Document:
     def __lemmatize(self, lemmatizer):
         self.tokens = [lemmatizer.lemmatize(token) for token in self.tokens]
 
-    def __create_graph_of_words(self, window):
-        n = len(self.tokens)
-        graph_of_words = {}
-        for i in range(n):
-            current_word = self.tokens[i]
-            for j in range(i + 1, min(i + window, n)):
-                observed_word = self.tokens[j]
-                if observed_word in graph_of_words:
-                    graph_of_words[observed_word].update([current_word])
-                else:
-                    graph_of_words[observed_word] = {current_word}
-        return graph_of_words
-
     def get_term_weights(self):
-        graph_of_words = self.__create_graph_of_words(window=4)
+        graph_of_words = create_graph_of_words(window=4, tokens=self.tokens)
         term_weights = {}
         for term, indegree_edges in graph_of_words.items():
             term_weights[term] = len(indegree_edges)
@@ -78,14 +74,13 @@ class Document:
         self.__remove_stopwords(stopwords_list)
         self.__lemmatize(lemmatizer)
 
+    def get_vocabulary(self):
+        return list(set(self.tokens))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     document = Document(url="3dradiology.stanford.edu_", folder=0, id_doc=0)
     document.load_data("data/cs276")
     word_net_lemmatizer = WordNetLemmatizer()
-    nltk_stopwords = stopwords.words('english')
+    nltk_stopwords = stopwords.words("english")
     document.process_document(nltk_stopwords, word_net_lemmatizer)
-
-
-
-
