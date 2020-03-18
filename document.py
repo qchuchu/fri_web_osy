@@ -6,7 +6,7 @@ from nltk.stem import WordNetLemmatizer, PorterStemmer
 
 class Document:
     """
-    This is class is for representing a document from the CS276 dataset
+    This class is for representing a document from the CS276 dataset
     """
 
     def __init__(self, id_doc: int, url: str, folder: int):
