@@ -21,6 +21,13 @@ class SearchEngine:
         return doc_scores
 
     def __get_posting_list(self, query: Query):
+        """
+
+        :param query: Query object tokenize and processed
+        :return: final_posting_list : ordered list of relevant documents for this query
+
+        final_posting_list is obtained by merging the posting lists of each document
+        """
         final_posting_list = []
         vocabulary = query.get_vocabulary()
         for token in vocabulary:
@@ -33,6 +40,14 @@ class SearchEngine:
         return final_posting_list
 
     def __get_score(self, posting_list, query: Query):
+        """
+
+        :param posting_list: the list of documents which contain the terms of the query
+        :param query: tokenized and processed query
+        :return: a dictionary of keys : documents of the posting_list, values : their score for this query
+
+        In this function we first calculate each tf score for the terms of the query.
+        """
         query_vector = [0 for _ in range(len(self.collection.term_index))]
         for token in query.get_vocabulary():
             try:
@@ -81,6 +96,7 @@ if __name__ == "__main__":
                 doc_scores.items(), key=lambda item: item[1], reverse=True
             )
         ]
+        print("Process {} duration : {} seconds".format(str(i), time() - start))
         with open("dev_predictions/query{}.out".format(str(i)), "w") as result_file:
             for doc_id in sorted_docs:
                 document = search_engine.collection.documents[doc_id]

@@ -5,7 +5,6 @@ from math import log
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from typing import List, Dict, Tuple
-from scipy import sparse
 
 
 class Collection:
@@ -21,6 +20,7 @@ class Collection:
         self.lemmatizer = lemmatizer
         self.term_index = {}
         self.path_to_data = path.join(getcwd(), "data/{}".format(name))
+        # self.path_to_data = path.join("data/{}".format(name))
         self.nb_docs = sum([len(files) for r, d, files in walk(self.path_to_data)])
         self.average_document_length = 0
         print("Loading Documents...")
@@ -53,7 +53,7 @@ class Collection:
                     self.documents.append(document)
                     nb_document_loaded += 1
                     print(
-                        "{}/{} document loaded !".format(
+                        "{}/{} documents loaded !".format(
                             nb_document_loaded, self.nb_docs
                         )
                     )
