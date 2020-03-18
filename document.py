@@ -1,4 +1,4 @@
-from os import path, getcwd
+from os import path
 from collections import Counter
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
