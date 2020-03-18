@@ -5,6 +5,7 @@ from nltk.stem import WordNetLemmatizer
 from os import path, listdir, getcwd, walk
 from pickle import load, dump
 from typing import List, Dict, Tuple
+from spacy_lemmatizer import SpacyLemmatizer
 
 
 class Collection:
@@ -41,7 +42,8 @@ class Collection:
             self.documents = self.__load_pickle_file("preprocessed_documents")
         except FileNotFoundError:
             nb_document_loaded = 0
-            for directory_index in range(10):
+            nb_of_folders = len(listdir("data/fquad"))
+            for directory_index in range(nb_of_folders):
                 path_directory = path.join(self.path_to_data, str(directory_index))
                 for filename in listdir(path_directory):
                     document = Document(
@@ -148,8 +150,8 @@ class Collection:
 
 
 if __name__ == "__main__":
-    word_net_lemmatizer = WordNetLemmatizer()
-    nltk_stopwords = stopwords.words("english")
+    spacy_french_lemmatizer = SpacyLemmatizer()
+    nltk_stopwords = stopwords.words("french")
     collection = Collection(
-        name="cs276", stopwords_list=nltk_stopwords, lemmatizer=word_net_lemmatizer
+        name="fquad", stopwords_list=nltk_stopwords, lemmatizer=spacy_french_lemmatizer
     )

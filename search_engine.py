@@ -1,7 +1,9 @@
 from collection import Collection
+from os import listdir
 from query import Query
-from helpers import merge_and_postings_list
+from helpers import merge_and_postings_list, merge_or_postings_list
 from nltk.corpus import stopwords
+from spacy_lemmatizer import SpacyLemmatizer
 from nltk.stem import WordNetLemmatizer
 from time import time
 from math import sqrt
@@ -26,7 +28,7 @@ class SearchEngine:
             if not final_posting_list:
                 final_posting_list = self.collection.get_posting_list(token)
             else:
-                final_posting_list = merge_and_postings_list(
+                final_posting_list = merge_or_postings_list(
                     final_posting_list, self.collection.get_posting_list(token)
                 )
         return final_posting_list
@@ -54,6 +56,15 @@ class SearchEngine:
 
 
 if __name__ == "__main__":
+    spacy_french_lemmatizer = SpacyLemmatizer()
+    nltk_stopwords = stopwords.words("french")
+    search_engine = SearchEngine(
+        collection_name="fquad",
+        stopwords_list=stopwords.words("french"),
+        lemmatizer=spacy_french_lemmatizer,
+    )
+    nb_queries = len(listdir("fquad_queries"))
+    """
     nltk_stopwords = stopwords.words("english")
     word_net_lemmatizer = WordNetLemmatizer()
     search_engine = SearchEngine(
@@ -61,10 +72,10 @@ if __name__ == "__main__":
         stopwords_list=nltk_stopwords,
         lemmatizer=word_net_lemmatizer,
     )
-
-    for i in range(1, 9):
+    """
+    for i in range(19113, nb_queries):
         start = time()
-        with (open("dev_queries/query.{}".format(str(i)), "r")) as query_file:
+        with (open("fquad_queries/query.{}".format(str(i)), "r")) as query_file:
             query_content = next(query_file).rstrip("\n")
         print(query_content)
         doc_scores_query = search_engine.search(query_content)
@@ -74,7 +85,7 @@ if __name__ == "__main__":
                 doc_scores_query.items(), key=lambda item: item[1], reverse=True
             )
         ]
-        with open("dev_predictions/{}.out".format(str(i)), "w") as result_file:
+        with open("fquad_predictions/out.{}".format(str(i)), "w") as result_file:
             for doc_id_query in sorted_docs:
                 document = search_engine.collection.documents[doc_id_query]
                 line = "{}/{} {}".format(

@@ -1,8 +1,8 @@
 from os import path
 from collections import Counter
 from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
 from helpers import create_graph_of_words
+from spacy_lemmatizer import SpacyLemmatizer
 
 
 class Document:
@@ -79,8 +79,8 @@ class Document:
 
 
 if __name__ == "__main__":
-    document = Document(url="3dradiology.stanford.edu_", folder=0, id_doc=0)
-    document.load_data("data/cs276")
-    word_net_lemmatizer = WordNetLemmatizer()
-    nltk_stopwords = stopwords.words("english")
-    document.process_document(nltk_stopwords, word_net_lemmatizer)
+    document = Document(url="context_0", folder=0, id_doc=0)
+    document.load_data("data/fquad")
+    spacy_french_lemmatizer = SpacyLemmatizer()
+    nltk_stopwords = stopwords.words("french")
+    document.process_document(nltk_stopwords, spacy_french_lemmatizer)

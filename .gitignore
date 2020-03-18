@@ -7,3 +7,5 @@ venv
 *inverted_index.p
 *preprocessed_documents.p
 *documents_norms.p
+fquad_train.json
+illuin_tokenizer.py
