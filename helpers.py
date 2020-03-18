@@ -1,7 +1,3 @@
-from typing import List
-from math import sqrt
-
-
 def create_graph_of_words(window, tokens):
     n = len(tokens)
     graph_of_words = {}
@@ -32,3 +28,9 @@ def merge_and_postings_list(posting_term1, posting_term2):
         elif posting_term1[index1] < posting_term2[index2]:
             index1 += 1
     return result
+
+
+def merge_or_postings_list(posting_term1, posting_term2):
+    result = set(posting_term1)
+    result.update(posting_term2)
+    return sorted(list(result))

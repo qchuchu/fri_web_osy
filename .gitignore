@@ -4,5 +4,6 @@ venv
 .idea
 .ipynb_checkpoints
 .vscode
-cs276_inverted_index.p
-cs276_preprocessed_documents.p
+*inverted_index.p
+*preprocessed_documents.p
+*documents_norms.p

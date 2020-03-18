@@ -3,9 +3,8 @@ from query import Query
 from helpers import merge_and_postings_list
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
-from sklearn.metrics.pairwise import cosine_similarity
-from scipy import sparse
 from time import time
+from math import sqrt
 
 
 class SearchEngine:
@@ -17,7 +16,7 @@ class SearchEngine:
     def search(self, string_query: str):
         query = Query(string_query.lower(), self.stopwords, self.lemmatizer)
         posting_list = self.__get_posting_list(query)
-        doc_scores = self.__get_score(posting_list, query)
+        doc_scores = self.__get_scores(posting_list, query)
         return doc_scores
 
     def __get_posting_list(self, query: Query):
@@ -32,32 +31,26 @@ class SearchEngine:
                 )
         return final_posting_list
 
-    def __get_score(self, posting_list, query: Query):
-        query_vector = [0 for _ in range(len(self.collection.term_index))]
-        for token in query.get_vocabulary():
-            try:
-                id_term = self.collection.term_index[token]
-            except KeyError:
-                continue
+    def __get_scores(self, posting_list, query: Query):
+        query_tf_idf = {}
+        norm_query_vector = 0
+        query_vocabulary = query.get_vocabulary()
+        for token in query_vocabulary:
             tf_idf = query.get_tf(token) * self.collection.get_idf(token)
-            query_vector[id_term] = tf_idf
-        query_vector = sparse.csr_matrix(query_vector)
-        doc_score = {}
+            query_tf_idf[token] = tf_idf
+            norm_query_vector += tf_idf ** 2
+        norm_query_vector = sqrt(norm_query_vector)
+        doc_scores = {}
         for doc_id in posting_list:
-            doc_vector = [0 for _ in range(len(self.collection.term_index))]
-            for token in self.collection.documents[doc_id].get_vocabulary():
-                try:
-                    id_token = self.collection.term_index[token]
-                    tw_idf = self.collection.get_tw_idf(
-                        target_term=token, target_doc_id=doc_id, b=0.003
-                    )
-                    doc_vector[id_token] = tw_idf
-                except KeyError as e:
-                    continue
-            doc_vector = sparse.csr_matrix(doc_vector)
-            score = cosine_similarity(query_vector, doc_vector)
-            doc_score[doc_id] = score[0][0]
-        return doc_score
+            score = 0
+            for token in query_vocabulary:
+                tw_idf = self.collection.get_tw_idf(
+                    target_term=token, target_doc_id=doc_id, b=0.003
+                )
+                score += query_tf_idf[token] * tw_idf
+            score /= self.collection.documents_norms[doc_id] * norm_query_vector
+            doc_scores[doc_id] = score
+        return doc_scores
 
 
 if __name__ == "__main__":
@@ -69,23 +62,23 @@ if __name__ == "__main__":
         lemmatizer=word_net_lemmatizer,
     )
 
-    for i in range(3, 9):
+    for i in range(1, 9):
         start = time()
         with (open("dev_queries/query.{}".format(str(i)), "r")) as query_file:
             query_content = next(query_file).rstrip("\n")
         print(query_content)
-        doc_scores = search_engine.search(query_content)
+        doc_scores_query = search_engine.search(query_content)
         sorted_docs = [
             k
             for k, v in sorted(
-                doc_scores.items(), key=lambda item: item[1], reverse=True
+                doc_scores_query.items(), key=lambda item: item[1], reverse=True
             )
         ]
-        with open("dev_predictions/query{}.out".format(str(i)), "w") as result_file:
-            for doc_id in sorted_docs:
-                document = search_engine.collection.documents[doc_id]
+        with open("dev_predictions/{}.out".format(str(i)), "w") as result_file:
+            for doc_id_query in sorted_docs:
+                document = search_engine.collection.documents[doc_id_query]
                 line = "{}/{} {}".format(
-                    document.folder, document.url, doc_scores[doc_id]
+                    document.folder, document.url, doc_scores_query[doc_id_query]
                 )
                 result_file.write(line + "\n")
         print("Query{} duration : {} seconds".format(str(i), time() - start))

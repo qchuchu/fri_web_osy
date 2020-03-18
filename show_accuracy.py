@@ -1,5 +1,9 @@
 def print_accuracy():
-    scores = []
+    """
+    This function compares the results from the dev predictions and dev output to evaluate the
+    performance of a model
+    :return:
+    """
     for i in range(1, 9):
         dev_output = []
         search_engine_output = []
@@ -14,20 +18,18 @@ def print_accuracy():
                 search_engine_output.append(parsed_line[0])
         if len(search_engine_output) == 0:
             print("Search Engine has failed on Query {}".format(i))
-            scores.append(0)
         else:
             search_engine_output = search_engine_output[: len(dev_output)]
-        score = 0
-        for url in search_engine_output:
-            if url in dev_output:
-                score += 1
-        print(
-            "For Query {} the Accuracy Score is {}".format(i, score / len(dev_output))
-        )
-        scores.append(score / len(dev_output))
-    return scores
+            score = 0
+            for url in search_engine_output:
+                if url in dev_output:
+                    score += 1
+            print(
+                "For Query {} the Accuracy Score is {}%".format(
+                    i, "{0:.2f}".format(score / len(dev_output) * 100)
+                )
+            )
 
 
 if __name__ == "__main__":
-    scores = print_accuracy()
-    print(scores)
+    print_accuracy()
