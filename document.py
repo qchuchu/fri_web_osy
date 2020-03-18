@@ -109,5 +109,3 @@ if __name__ == '__main__':
     document.process_document(nltk_stopwords, word_net_lemmatizer)
     document.get_term_weights()
 
-
-
