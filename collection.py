@@ -97,11 +97,11 @@ class Collection:
             self.__store_pickle_file("documents_norms", self.documents_norms)
 
     def __load_pickle_file(self, filename):
-        pickle_filename = "{}_{}.p".format(self.name, filename)
+        pickle_filename = "indexes/{}_{}.p".format(self.name, filename)
         return load(open(pickle_filename, "rb"))
 
     def __store_pickle_file(self, filename, collection_object):
-        target_file = open("{}_{}.p".format(self.name, filename), "wb")
+        target_file = open("indexes/{}_{}.p".format(self.name, filename), "wb")
         dump(collection_object, target_file)
 
     def get_vocabulary(self):
