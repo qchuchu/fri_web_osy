@@ -3,6 +3,7 @@ from math import sqrt
 
 from nltk.stem import WordNetLemmatizer
 import click
+import sys
 
 from collection import Collection
 from query import Query
@@ -10,8 +11,17 @@ from helpers import merge_and_postings_list
 
 
 class SearchEngine:
-    def __init__(self, collection_name: str, stopwords_list, lemmatizer):
-        self.collection = Collection(collection_name, stopwords_list, lemmatizer)
+    def __init__(
+        self,
+        collection_name: str,
+        stopwords_list,
+        lemmatizer,
+        weighting_model: str = "tw-idf",
+    ):
+        self.collection = Collection(
+            collection_name, stopwords_list, lemmatizer, weighting_model
+        )
+        self.weighting_model = weighting_model
         self.stopwords = stopwords_list
         self.lemmatizer = lemmatizer
 
@@ -74,21 +84,33 @@ class SearchEngine:
         for doc_id in posting_list:
             score = 0
             for token in query_vocabulary:
-                tw_idf = self.collection.get_tw_idf(
-                    target_term=token, target_doc_id=doc_id, b=0.003
-                )
-                score += query_tf_idf[token] * tw_idf
+                if self.weighting_model == "tw-idf":
+                    weight = self.collection.get_tw_idf(
+                        target_term=token, target_doc_id=doc_id, b=0.003
+                    )
+                elif self.weighting_model == "tf-idf":
+                    weight = self.collection.get_piv_plus(
+                        target_term=token, target_doc_id=doc_id, b=0.2
+                    )
+                else:
+                    weight = self.collection.get_bm25_plus(
+                        target_term=token, target_doc_id=doc_id, b=0.75, k1=1.2
+                    )
+                score += query_tf_idf[token] * weight
             score /= self.collection.documents_norms[doc_id] * norm_query_vector
             doc_scores[doc_id] = score
         return doc_scores
 
 
 if __name__ == "__main__":
+    weighting_model = sys.argv[1]
     word_net_lemmatizer = WordNetLemmatizer()
     search_engine = SearchEngine(
-        collection_name="cs276", stopwords_list=[], lemmatizer=word_net_lemmatizer,
+        collection_name="cs276",
+        stopwords_list=[],
+        lemmatizer=word_net_lemmatizer,
+        weighting_model=weighting_model,
     )
-
     for i in range(1, 9):
         start = time()
         with (open("dev_queries/query.{}".format(str(i)), "r")) as query_file:

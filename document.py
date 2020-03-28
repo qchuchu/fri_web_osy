@@ -78,6 +78,15 @@ class Document:
             term_weights[term] = len(indegree_edges)
         return term_weights
 
+    def get_term_frequencies(self):
+        term_frequencies = {}
+        for token in self.tokens:
+            if token in term_frequencies:
+                term_frequencies[token] += 1
+            else:
+                term_frequencies[token] = 1
+        return term_frequencies
+
     def process_document(self, stopwords_list, lemmatizer):
         self.__remove_stopwords(stopwords_list)
         self.__store_key_words()
