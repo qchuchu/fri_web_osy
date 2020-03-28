@@ -1,6 +1,6 @@
 from os import path, listdir, getcwd, walk
 from pickle import load, dump
-from typing import List, Dict, Tuple
+from typing import List, Dict
 from math import log, sqrt
 
 from nltk.corpus import stopwords
@@ -19,7 +19,7 @@ class Collection:
     def __init__(self, name: str, stopwords_list: List[str], lemmatizer):
         self.__name = name
         self.documents: List[Document] = []
-        self.inverted_index: Dict[str, List[Tuple[int, int]]] = {}
+        self.inverted_index: Dict[str, Dict[int, int]] = {}
         self.documents_norms: Dict[int, float] = {}
         self.stopwords = stopwords_list
         self.lemmatizer = lemmatizer
@@ -70,21 +70,23 @@ class Collection:
         try:
             self.inverted_index = self.__load_pickle_file("inverted_index")
         except FileNotFoundError:
-            for document in self.documents:
+            click.echo("[Collection] Creating inverted index ...")
+            for document in tqdm(self.documents):
                 term_weights = document.get_term_weights()
                 for term, weight in term_weights.items():
                     if term in self.inverted_index:
-                        self.inverted_index[term].append((document.id, weight))
+                        self.inverted_index[term][document.id] = weight
                     else:
-                        self.inverted_index[term] = [(document.id, weight)]
+                        self.inverted_index[term] = {document.id: weight}
             self.__store_pickle_file("inverted_index", self.inverted_index)
 
     def __load_documents_norms(self):
         try:
             self.documents_norms = self.__load_pickle_file("documents_norms")
         except FileNotFoundError:
+            click.echo("[Collection] Computing documents norm ...")
             nb_norms_calculated = 0
-            for document in self.documents:
+            for document in tqdm(self.documents):
                 doc_vocabulary = document.get_vocabulary()
                 norm = 0
                 for token in doc_vocabulary:
@@ -92,9 +94,6 @@ class Collection:
                 norm = sqrt(norm)
                 self.documents_norms[document.id] = norm
                 nb_norms_calculated += 1
-                print(
-                    "{}/{} norms calculated !".format(nb_norms_calculated, self.nb_docs)
-                )
             self.__store_pickle_file("documents_norms", self.documents_norms)
 
     def __load_pickle_file(self, filename):
@@ -110,13 +109,10 @@ class Collection:
 
     def __get_term_weight(self, target_term, target_doc_id):
         try:
-            term_weights = self.inverted_index[target_term]
+            term_weight = self.inverted_index[target_term][target_doc_id]
+            return term_weight
         except KeyError:
             return 0
-        for doc_id, weight in term_weights:
-            if doc_id == target_doc_id:
-                return weight
-        return 0
 
     def __get_pivoted_term_weight(self, target_term, target_doc_id, b):
         term_weight = self.__get_term_weight(target_term, target_doc_id)
@@ -131,7 +127,7 @@ class Collection:
 
     def get_idf(self, target_term):
         try:
-            df = len(self.inverted_index[target_term])
+            df = len(self.inverted_index[target_term].keys())
         except KeyError:
             return 0
         return log((self.nb_docs + 1) / df)
@@ -143,7 +139,7 @@ class Collection:
 
     def get_posting_list(self, target_term):
         try:
-            doc_list = [doc_id for doc_id, weight in self.inverted_index[target_term]]
+            doc_list = list(self.inverted_index[target_term].keys())
         except KeyError:
             return []
         return doc_list

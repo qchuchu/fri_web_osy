@@ -1,6 +1,5 @@
 import time
 
-from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import click
 
@@ -19,12 +18,9 @@ def search(query, count):
     start_time = time.time()
 
     click.secho("Loading search engine ...", fg="blue", bold=True)
-    nltk_stopwords = stopwords.words("english")
     word_net_lemmatizer = WordNetLemmatizer()
     search_engine = SearchEngine(
-        collection_name="cs276",
-        stopwords_list=nltk_stopwords,
-        lemmatizer=word_net_lemmatizer,
+        collection_name="cs276", stopwords_list=[], lemmatizer=word_net_lemmatizer,
     )
 
     click.secho("Searching query ...", fg="blue", bold=True)

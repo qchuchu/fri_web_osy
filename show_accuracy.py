@@ -1,3 +1,6 @@
+from helpers import merge_and_postings_list
+
+
 def print_accuracy():
     """
     This function compares the results from the dev predictions and dev output to evaluate the
@@ -20,13 +23,16 @@ def print_accuracy():
             print("Search Engine has failed on Query {}".format(i))
         else:
             search_engine_output = search_engine_output[: len(dev_output)]
-            score = 0
-            for url in search_engine_output:
-                if url in dev_output:
-                    score += 1
+
+            posting_term1 = sorted(dev_output)
+            posting_term2 = sorted(search_engine_output)
+
+            final_list = merge_and_postings_list(posting_term1, posting_term2)
+            score = len(final_list) / len(dev_output)
+
             print(
                 "For Query {} the Accuracy Score is {}%".format(
-                    i, "{0:.2f}".format(score / len(dev_output) * 100)
+                    i, "{0:.2f}".format(score * 100)
                 )
             )
 

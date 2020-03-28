@@ -1,10 +1,12 @@
+from time import time
+from math import sqrt
+
+from nltk.stem import WordNetLemmatizer
+import click
+
 from collection import Collection
 from query import Query
 from helpers import merge_and_postings_list
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
-from time import time
-from math import sqrt
 
 
 class SearchEngine:
@@ -23,15 +25,43 @@ class SearchEngine:
         final_posting_list = []
         vocabulary = query.get_vocabulary()
         for token in vocabulary:
+            start_time = time()
             if not final_posting_list:
                 final_posting_list = self.collection.get_posting_list(token)
+                posting_list_time = round(time() - start_time, 2)
+                click.secho(
+                    "[Search Engine] Token: {} | Posting list: {} items | Time: {}s".format(
+                        token, len(final_posting_list), posting_list_time
+                    ),
+                    fg="bright_blue",
+                )
             else:
+                posting_list = self.collection.get_posting_list(token)
+                posting_list_time = round(time() - start_time, 2)
+                click.secho(
+                    "[Search Engine] Token: {} | Posting list: {} items | Time: {}s | ".format(
+                        token, len(posting_list), posting_list_time
+                    ),
+                    fg="bright_blue",
+                    nl=False,
+                )
+                click.secho("Merge posting list needed", fg="red", bold=True, nl=False)
+                start_time = time()
                 final_posting_list = merge_and_postings_list(
-                    final_posting_list, self.collection.get_posting_list(token)
+                    final_posting_list, posting_list
+                )
+                merge_time = round(time() - start_time, 2)
+                click.secho(
+                    " | Merge time: {}s | Final : {} terms".format(
+                        merge_time, len(final_posting_list)
+                    ),
+                    fg="red",
+                    bold=True,
                 )
         return final_posting_list
 
     def __get_scores(self, posting_list, query: Query):
+        click.secho("[Search Engine] Computing search scores ...", fg="bright_blue")
         query_tf_idf = {}
         norm_query_vector = 0
         query_vocabulary = query.get_vocabulary()
@@ -54,12 +84,9 @@ class SearchEngine:
 
 
 if __name__ == "__main__":
-    nltk_stopwords = stopwords.words("english")
     word_net_lemmatizer = WordNetLemmatizer()
     search_engine = SearchEngine(
-        collection_name="cs276",
-        stopwords_list=nltk_stopwords,
-        lemmatizer=word_net_lemmatizer,
+        collection_name="cs276", stopwords_list=[], lemmatizer=word_net_lemmatizer,
     )
 
     for i in range(1, 9):

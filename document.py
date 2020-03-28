@@ -4,6 +4,8 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from helpers import create_graph_of_words
 
+STOPWORDS = stopwords.words("english")
+
 
 class Document:
     """
@@ -56,7 +58,10 @@ class Document:
         self.__length = len(self.tokens)
 
     def __store_key_words(self):
-        counter = Counter(self.tokens)
+        tokens_without_stopwords = [
+            token for token in self.tokens if token not in STOPWORDS
+        ]
+        counter = Counter(tokens_without_stopwords)
         self.__key_words = [x[0] for x in counter.most_common(5)]
 
     def __remove_stopwords(self, stopwords_list):
