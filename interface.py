@@ -44,11 +44,8 @@ def search(query, count):
 
     for i, doc_id_query in enumerate(sorted_docs[:count]):
         document = search_engine.collection.documents[doc_id_query]
-        click.echo(
-            "{}.\t{}/{}\n\t{}".format(
-                i, document.folder, document.url, " ".join(document.key_words)
-            )
-        )
+        click.secho("{}.\t{}/{}".format(i, document.folder, document.url), bold=True)
+        click.secho("\t{}\n".format(" ".join(document.key_words)), fg="red")
 
 
 if __name__ == "__main__":

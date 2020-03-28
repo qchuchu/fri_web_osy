@@ -6,6 +6,7 @@ from math import log, sqrt
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from tqdm import tqdm
+import click
 
 from document import Document
 
@@ -25,15 +26,15 @@ class Collection:
         self.path_to_data = path.join(getcwd(), "data/{}".format(name))
         self.nb_docs = sum([len(files) for r, d, files in walk(self.path_to_data)])
         self.average_document_length = 0
-        print("Loading Documents...")
+        click.secho("[Collection] Loading Documents...", fg="bright_blue")
         self.__load_documents()
-        print("All Document Loaded !")
-        print("Loading Inverted Index...")
+        click.secho("[Collection] All Document Loaded !", fg="bright_blue")
+        click.secho("[Collection] Loading Inverted Index...", fg="bright_blue")
         self.__load_inverted_index()
-        print("Inverted Index Loaded")
-        print("Load Documents Norms...")
+        click.secho("[Collection] Inverted Index Loaded !", fg="bright_blue")
+        click.secho("[Collection] Load Documents Norms...", fg="bright_blue")
         self.__load_documents_norms()
-        print("Documents Norms Loaded...")
+        click.secho("[Collection] Documents Norms Loaded !", fg="bright_blue")
 
     @property
     def name(self):
@@ -45,7 +46,9 @@ class Collection:
         except FileNotFoundError:
             nb_document_loaded = 0
             for directory_index in range(10):
-                print("Processing folder #{}...".format(directory_index))
+                click.echo(
+                    "[Collection] Processing folder #{}...".format(directory_index)
+                )
                 path_directory = path.join(self.path_to_data, str(directory_index))
                 for filename in tqdm(listdir(path_directory)):
                     document = Document(
