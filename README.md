@@ -4,6 +4,8 @@
 
 This project is a search engine with a good looking terminal interface and some queries to test our search algorithm. This algorithm is based on the TW-IDF described in [this paper](https://frncsrss.github.io/papers/rousseau-cikm2013.pdf), where we compute the link between words in a fixed window.
 
+[![screenshot](https://raw.githubusercontent.com/qchuchu/google-1998/master/assets/screenshot.png)](https://raw.githubusercontent.com/qchuchu/google-1998/master/assets/screenshot.png)
+
 ## Setting up the project
 
 ### Creating a virtual environment
@@ -53,8 +55,7 @@ This will install all of the dependencies at specific versions to ensure they ar
 We use NLTK as our package for word libraries, and you may need to install some datasets:
 
 ```
-(venv) $ python -m nltk.downloader stopwords
-(venv) $ python -m nltk.downloader wordnet
+(venv) $ python -m nltk.downloader stopwords wordnet
 ```
 
 ### Install the data
