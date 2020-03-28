@@ -34,6 +34,10 @@ class Document:
     def url(self):
         return self.__url
 
+    @property
+    def key_words(self):
+        return self.__key_words
+
     def load_data(self, path_to_documents):
         path_to_file = path.join(
             path_to_documents, "{}/{}".format(self.__folder, self.__url)
@@ -42,7 +46,6 @@ class Document:
             for line in file.readlines():
                 self.tokens.extend(line.rstrip("\n").split(" "))
         self.__remove_not_alpha()
-        self.__store_key_words()
 
     def __remove_not_alpha(self):
         filtered_tokens = []
@@ -72,6 +75,7 @@ class Document:
 
     def process_document(self, stopwords_list, lemmatizer):
         self.__remove_stopwords(stopwords_list)
+        self.__store_key_words()
         self.__lemmatize(lemmatizer)
 
     def get_vocabulary(self):

@@ -1,10 +1,13 @@
-from document import Document
-from math import log, sqrt
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
 from os import path, listdir, getcwd, walk
 from pickle import load, dump
 from typing import List, Dict, Tuple
+from math import log, sqrt
+
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from tqdm import tqdm
+
+from document import Document
 
 
 class Collection:
@@ -42,8 +45,9 @@ class Collection:
         except FileNotFoundError:
             nb_document_loaded = 0
             for directory_index in range(10):
+                print("Processing folder #{}...".format(directory_index))
                 path_directory = path.join(self.path_to_data, str(directory_index))
-                for filename in listdir(path_directory):
+                for filename in tqdm(listdir(path_directory)):
                     document = Document(
                         url=filename, folder=directory_index, id_doc=nb_document_loaded
                     )
@@ -53,11 +57,6 @@ class Collection:
                     )
                     self.documents.append(document)
                     nb_document_loaded += 1
-                    print(
-                        "{}/{} document loaded !".format(
-                            nb_document_loaded, self.nb_docs
-                        )
-                    )
             self.__store_pickle_file("preprocessed_documents", self.documents)
         assert len(self.documents) == self.nb_docs
         for document in self.documents:
@@ -109,7 +108,7 @@ class Collection:
     def __get_term_weight(self, target_term, target_doc_id):
         try:
             term_weights = self.inverted_index[target_term]
-        except KeyError as e:
+        except KeyError:
             return 0
         for doc_id, weight in term_weights:
             if doc_id == target_doc_id:
@@ -130,7 +129,7 @@ class Collection:
     def get_idf(self, target_term):
         try:
             df = len(self.inverted_index[target_term])
-        except KeyError as e:
+        except KeyError:
             return 0
         return log((self.nb_docs + 1) / df)
 
@@ -142,7 +141,7 @@ class Collection:
     def get_posting_list(self, target_term):
         try:
             doc_list = [doc_id for doc_id, weight in self.inverted_index[target_term]]
-        except KeyError as e:
+        except KeyError:
             return []
         return doc_list
 
