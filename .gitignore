@@ -125,9 +125,12 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-data
+.idea/
+.vscode/
+
+data/
 notebook_data/file_index.txt
 
-/indexes
+indexes/
 
 fquad_train.json
