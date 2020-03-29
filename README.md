@@ -4,6 +4,11 @@
 
 This project is a search engine with a good looking terminal interface and some queries to test our search algorithm. This algorithm is based on the TW-IDF described in [this paper](https://frncsrss.github.io/papers/rousseau-cikm2013.pdf), where we compute the link between words in a fixed window.
 
+We also added two other term-weighting models :
+
+- TF-IDF
+- Okapi-BM25
+
 [![screenshot](https://raw.githubusercontent.com/qchuchu/google-1998/master/assets/screenshot.png)](https://raw.githubusercontent.com/qchuchu/google-1998/master/assets/screenshot.png)
 
 ## Setting up the project
@@ -60,7 +65,21 @@ We use NLTK as our package for word libraries, and you may need to install some 
 
 ### Install the data
 
-This search engine was built to work on the CS276 data by Standord Education. The dataset can be found [here](http://web.stanford.edu/class/cs276/pa/pa1-data.zip) and needs to be installed in the `./data/cs276` folder.
+This search engine was built to work on the CS276 data by Stanford Education. The dataset can be found [here](http://web.stanford.edu/class/cs276/pa/pa1-data.zip) and needs to be installed in the `./data/cs276` folder.
+
+You need to have the following structure:
+
+```
+project
+└───data
+│   └───cs276
+|       └───0
+|       |   |   3dradiology.stanford.edu_
+|       |   |   ...
+|       └───1
+|        ...
+```
+
 
 ### Launching the interface !
 
@@ -78,19 +97,30 @@ You can also specify the count of results that it will display, like this:
 (venv) $ python interface.py --count 20
 ```
 
+By default the term-weighting model is TW-IDF, but you can also try the two other weighting models
+(TF-IDF and Okapi-BM25) by adding an argument :
+
+```
+(venv) $ python interface.py --count 20 --w tf-idf
+```
+
+```
+(venv) $ python interface.py --count 20 --w okapi-bm25
+```
+
 ### Test the sample queries
 
-In order to test our search algorithm, we have in the `dev_*` folders sample queries and their expected output. You can compute their output from our algorithm by running:
+In order to test our search algorithm, we have in the `dev_*` folders sample queries and their expected output.
 
+You can test them and compute the accuracy scores by simply running the following command :
 ```
-(venv) $ python search_engine.py
+(venv) $ python show_accuracy.py -w tw-idf
 ```
 
-And then you can compute the accuracies of our outputs (percentage of expected output that we got right):
+This will test the results using the TW-IDF weighting model. You can also try two other weighting model :
 
-```
-(venv) $ python show_accuracy.py
-```
+- Okapi-BM25 (by passing the `okapi-bm25` as an argument)
+- TF-IDF (by passing the `tf-idf` as an argument)
 
 ## Technical description
 
@@ -99,6 +129,17 @@ And then you can compute the accuracies of our outputs (percentage of expected o
 The documents are preprocessed in the indexing pipeline. In a first time removed the English stopwords, but we kept them in the final version for more accuracy, as the performance for indexing and query time is quite the same.
 We then lemmatize the tokens with the WordNet network.
 
-### Algorithm used
+### Algorithms used
 
-We used a TW-IDF where the goal is to compute the number of times a word is linked to a new word, in contrary of the TF-IDF where we only care about the frequency of a word in a document.
+#### TW-IDF
+
+TW-IDF tries to catch the different nuances of a word, by only counting the different links to other words in a window of 4.
+
+#### TF-IDF and Okapi-BM25
+
+TF-IDF and Okapi-BM25 are two different algorithms that are based on the term frequency of a word in a document
+They both then normalize the term-frequency in order to take into account :
+
+- The size of the document
+- The occurence of a word in a document (i.e. the normalized term weight difference won't be the same if a word is seen
+1 time vs 2 times than if a word appears 100 times vs 101 times).

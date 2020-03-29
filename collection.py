@@ -3,7 +3,6 @@ from pickle import load, dump
 from typing import List, Dict
 from math import log, sqrt
 
-from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from tqdm import tqdm
 import click
@@ -46,7 +45,7 @@ class Collection:
         self.average_document_length = 0
         click.secho(
             "[Collection] The chosen index is based on : {}".format(
-                weighting_model.upper()
+                weighting_model.upper(), fg="bright_blue"
             )
         )
         click.secho("[Collection] Loading Documents...", fg="bright_blue")
@@ -237,7 +236,6 @@ class Collection:
 
 if __name__ == "__main__":
     word_net_lemmatizer = WordNetLemmatizer()
-    nltk_stopwords = stopwords.words("english")
     collection = Collection(
-        name="cs276", stopwords_list=nltk_stopwords, lemmatizer=word_net_lemmatizer
+        name="cs276", stopwords_list=[], lemmatizer=word_net_lemmatizer
     )
