@@ -45,7 +45,7 @@ To get out of the environment, simply run:
 While the virtual environment is active, install the required dependencies by running:
 
 ```
-(venv) $ pip -r requirements.txt
+(venv) $ pip install -r requirements.txt
 ```
 
 This will install all of the dependencies at specific versions to ensure they are compatible with one another.
