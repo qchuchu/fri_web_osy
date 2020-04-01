@@ -23,9 +23,9 @@ while "cs276_request" not in globals():
                 f.write(data)
         t.close()
     except ConnectionError as e:
-        sleep(5)
+        sleep(5 + attempts)
         attempts += 1
-        print("Attempt {} aborted".format(attempts))
+        print("Attempt {} failed".format(attempts))
 end = time()
 print("Corpus Downloaded!")
 print(
