@@ -67,7 +67,12 @@ We use NLTK as our package for word libraries, and you may need to install some 
 
 This search engine was built to work on the CS276 data by Stanford Education. The dataset can be found [here](http://web.stanford.edu/class/cs276/pa/pa1-data.zip) and needs to be installed in the `./data/cs276` folder.
 
-You need to have the following structure:
+You can install the data by running
+```
+python download_data.py
+```
+
+You will have the following structure:
 
 ```
 project
@@ -110,7 +115,7 @@ By default the term-weighting model is TW-IDF, but you can also try the two othe
 
 ### Test the sample queries
 
-In order to test our search algorithm, we have in the `dev_*` folders sample queries and their expected output.
+In order to test our search algorithm, we have in the `dev_*` folders (in the `dev_resources` folder) sample queries and their expected output.
 
 You can test them and compute the accuracy scores by simply running the following command :
 ```

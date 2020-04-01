@@ -137,4 +137,4 @@ indexes/
 
 fquad_train.json
 
-dev_predictions/
+dev_resources/predictions/

@@ -7,7 +7,7 @@ from nltk.stem import WordNetLemmatizer
 from tqdm import tqdm
 import click
 
-from document import Document
+from models.document import Document
 
 WEIGHTING_MODELS = ["tf-idf", "tw-idf", "okapi-bm25"]
 WEIGHTING_MODEL_INDEX = {"tf-idf": "tf", "tw-idf": "tw", "okapi-bm25": "tf"}
@@ -71,8 +71,9 @@ class Collection:
         except FileNotFoundError:
             nb_document_loaded = 0
             for directory_index in range(10):
-                click.echo(
-                    "[Collection] Processing folder #{}...".format(directory_index)
+                click.secho(
+                    "[Collection] Processing folder #{}...".format(directory_index),
+                    fg="bright_blue",
                 )
                 path_directory = path.join(self.path_to_data, str(directory_index))
                 for filename in tqdm(listdir(path_directory)):
@@ -97,7 +98,7 @@ class Collection:
         try:
             self.inverted_index = self.__load_pickle_file(pickle_filename)
         except FileNotFoundError:
-            click.echo("[Collection] Creating inverted index ...")
+            click.secho("[Collection] Creating inverted index ...", fg="bright_blue")
             for document in tqdm(self.documents):
                 if inverted_index_model == "tw":
                     term_weights = document.get_term_weights()

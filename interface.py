@@ -4,7 +4,7 @@ from nltk.stem import WordNetLemmatizer
 import click
 import pyfiglet
 
-from search_engine import SearchEngine
+from models.search_engine import SearchEngine
 
 
 @click.command()

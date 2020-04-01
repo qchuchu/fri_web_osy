@@ -4,9 +4,9 @@ from time import time
 from nltk.stem import WordNetLemmatizer
 import click
 
-from collection import Collection
-from query import Query
-from helpers import merge_and_postings_list
+from models.collection import Collection
+from models.query import Query
+from utils.helpers import merge_and_postings_list
 
 
 class SearchEngine:

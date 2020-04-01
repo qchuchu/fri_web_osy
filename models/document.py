@@ -2,7 +2,7 @@ from os import path
 from collections import Counter
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
-from helpers import create_graph_of_words
+from utils.helpers import create_graph_of_words
 
 STOPWORDS = stopwords.words("english")
 
