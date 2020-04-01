@@ -1,5 +1,4 @@
 from time import time
-
 from nltk.stem import WordNetLemmatizer
 
 from search_engine import SearchEngine

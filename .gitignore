@@ -128,9 +128,13 @@ dmypy.json
 .idea/
 .vscode/
 
+#cs276 data
 data/
 notebook_data/file_index.txt
 
+#different indexes
 indexes/
 
 fquad_train.json
+
+dev_predictions/
