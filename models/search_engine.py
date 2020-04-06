@@ -133,5 +133,5 @@ if __name__ == "__main__":
         collection_name="cs276",
         stopwords_list=[],
         lemmatizer=word_net_lemmatizer,
-        weighting_model=weighting_model,
     )
+    doc_scores = search_engine.search("stanford class")
