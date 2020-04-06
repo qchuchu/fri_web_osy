@@ -3,10 +3,12 @@ from time import time
 
 from nltk.stem import WordNetLemmatizer
 import click
+import numpy as np
 
 from models.collection import Collection
 from models.query import Query
 from utils.helpers import merge_and_postings_list
+from models.SortedList import SortedList
 
 
 class SearchEngine:
@@ -27,7 +29,9 @@ class SearchEngine:
     def search(self, string_query: str):
         query = Query(string_query.lower(), self.stopwords, self.lemmatizer)
         posting_list = self.__get_posting_list(query)
-        doc_scores = self.__get_scores(posting_list, query)
+        # doc_scores = self.__get_scores(posting_list, query)
+        doc_scores = self.__get_scores_list_top_k(query, 100)
+
         return doc_scores
 
     def __get_posting_list(self, query: Query):
@@ -68,6 +72,28 @@ class SearchEngine:
                     bold=True,
                 )
         return final_posting_list
+
+
+    def __get_scores_list_top_k(self, query: Query, k: int):
+        # pre computing
+        scores = np.zeros(self.collection.nb_docs)
+        vocabulary = query.get_vocabulary()
+        query_tf_idf = {}
+        norm_query_vector = 0
+        best_values = SortedList(k * 10)
+        for token in vocabulary:
+            tf_idf = query.get_tf(token) * self.collection.get_idf(token)
+            query_tf_idf[token] = tf_idf
+            norm_query_vector += tf_idf ** 2
+        norm_query_vector = sqrt(norm_query_vector)
+        doc_scores = {}
+
+        for token in vocabulary:
+            best_values = self.collection.make_list_and_score(token, scores, best_values, query_tf_idf[token])
+        for tup in best_values:
+            doc_scores[tup[1]] = tup[0] / norm_query_vector
+        return doc_scores
+
 
     def __get_scores(self, posting_list, query: Query):
         click.secho("[Search Engine] Computing search scores ...", fg="bright_blue")

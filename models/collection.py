@@ -8,6 +8,7 @@ from tqdm import tqdm
 import click
 
 from models.document import Document
+from models.SortedList import SortedList
 
 WEIGHTING_MODELS = ["tf-idf", "tw-idf", "okapi-bm25"]
 WEIGHTING_MODEL_INDEX = {"tf-idf": "tf", "tw-idf": "tw", "okapi-bm25": "tf"}
@@ -233,6 +234,18 @@ class Collection:
         except KeyError:
             return []
         return doc_list
+
+    def make_list_and_score(self, token, scores, best_values, tf_idf):
+        try:
+            doc_list = list(self.inverted_index[token].keys())
+        except KeyError:
+            return scores, best_values
+        for doc_id in doc_list:
+            scores[doc_id] = scores[doc_id] + (tf_idf * self.get_tw_idf(
+                        target_term=token, target_doc_id=doc_id, b=0.003
+                    )) / self.documents_norms[doc_id]
+            best_values.insert(scores[doc_id], doc_id)
+        return best_values
 
 
 if __name__ == "__main__":
