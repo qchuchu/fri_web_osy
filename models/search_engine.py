@@ -6,7 +6,7 @@ import click
 
 from models.collection import Collection
 from models.query import Query
-from utils.helpers import merge_and_postings_list
+from utils.helpers import merge_or_postings_list
 
 
 class SearchEngine:
@@ -56,7 +56,7 @@ class SearchEngine:
                 )
                 click.secho("Merge posting list needed", fg="red", bold=True, nl=False)
                 start_time = time()
-                final_posting_list = merge_and_postings_list(
+                final_posting_list = merge_or_postings_list(
                     final_posting_list, posting_list
                 )
                 merge_time = round(time() - start_time, 2)
@@ -106,6 +106,5 @@ if __name__ == "__main__":
     search_engine = SearchEngine(
         collection_name="cs276",
         stopwords_list=[],
-        lemmatizer=word_net_lemmatizer,
-        weighting_model=weighting_model,
+        lemmatizer=word_net_lemmatizer
     )
