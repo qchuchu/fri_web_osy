@@ -134,7 +134,3 @@ notebook_data/file_index.txt
 
 #different indexes
 indexes/
-
-fquad_train.json
-
-dev_resources/predictions/
